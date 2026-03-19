@@ -1,0 +1,278 @@
+{
+  "info": {
+    "name": "wshop-api",
+    "_postman_id": "wshop-api-rest-collection",
+    "description": "Collection Postman pour l'API REST Gestion de Magasins.\n\n**Prérequis :** importer également l'environnement `wshop-api.postman_environment.json`.\n\nLes requêtes Register et Login alimentent automatiquement la variable `{{token}}` via le script Tests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "    pm.environment.set('token', json.data.token);",
+                  "    console.log('Token saved:', json.data.token.substring(0, 20) + '...');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"monmotdepasse\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Crée un compte et retourne un token JWT.\nLe script Tests sauvegarde automatiquement le token dans la variable d'environnement `{{token}}`."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "    pm.environment.set('token', json.data.token);",
+                  "    console.log('Token saved:', json.data.token.substring(0, 20) + '...');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"monmotdepasse\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Authentifie un utilisateur et retourne un token JWT.\nLe script Tests sauvegarde automatiquement le token dans la variable d'environnement `{{token}}`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stores",
+      "item": [
+        {
+          "name": "Lister les magasins",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/stores",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stores"],
+              "query": [
+                { "key": "city",     "value": "Paris",    "disabled": true },
+                { "key": "country",  "value": "FR",       "disabled": true },
+                { "key": "category", "value": "clothing", "disabled": true },
+                { "key": "is_active","value": "1",        "disabled": true },
+                { "key": "name",     "value": "zara",     "disabled": true },
+                { "key": "sort",     "value": "name",     "disabled": true },
+                { "key": "order",    "value": "asc",      "disabled": true },
+                { "key": "page",     "value": "1",        "disabled": true },
+                { "key": "per_page", "value": "20",       "disabled": true }
+              ]
+            },
+            "description": "Retourne la liste paginée des magasins.\nActiver/désactiver les query params selon les besoins."
+          }
+        },
+        {
+          "name": "Récupérer un magasin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/stores/{{store_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stores", "{{store_id}}"]
+            },
+            "description": "Retourne un magasin par son ID.\nRemplacer `{{store_id}}` par l'ID souhaité ou définir la variable d'environnement."
+          }
+        },
+        {
+          "name": "Créer un magasin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "    pm.environment.set('store_id', json.data.id);",
+                  "    console.log('store_id saved:', json.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ma Boutique\",\n  \"address\": \"10 rue de la Paix\",\n  \"city\": \"Paris\",\n  \"postal_code\": \"75001\",\n  \"country\": \"FR\",\n  \"phone\": \"0123456789\",\n  \"email\": \"contact@maboutique.fr\",\n  \"category\": \"clothing\",\n  \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/stores",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stores"]
+            },
+            "description": "Crée un nouveau magasin.\nChamps requis : name, address, city, postal_code.\nLe script Tests sauvegarde l'ID du magasin créé dans `{{store_id}}`."
+          }
+        },
+        {
+          "name": "Mettre à jour un magasin (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nouveau Nom\",\n  \"address\": \"5 avenue des Champs\",\n  \"city\": \"Paris\",\n  \"postal_code\": \"75008\",\n  \"country\": \"FR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/stores/{{store_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stores", "{{store_id}}"]
+            },
+            "description": "Remplacement complet d'un magasin (PUT).\nTous les champs fournis remplacent les valeurs existantes."
+          }
+        },
+        {
+          "name": "Mise à jour partielle (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city\": \"Lyon\",\n  \"is_active\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/stores/{{store_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stores", "{{store_id}}"]
+            },
+            "description": "Mise à jour partielle d'un magasin (PATCH).\nSeuls les champs fournis sont modifiés."
+          }
+        },
+        {
+          "name": "Supprimer un magasin",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/stores/{{store_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stores", "{{store_id}}"]
+            },
+            "description": "Supprime un magasin par son ID. Retourne 204 sans corps."
+          }
+        }
+      ]
+    }
+  ]
+}

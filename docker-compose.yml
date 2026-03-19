@@ -1,0 +1,63 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: wshop_php
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - wshop
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: wshop_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - wshop
+
+  mysql:
+    image: mysql:8.0
+    container_name: wshop_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: wshop
+      MYSQL_USER: wshop
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uwshop", "-psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - wshop
+
+  redis:
+    image: redis:7-alpine
+    container_name: wshop_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - wshop
+
+networks:
+  wshop:
+    driver: bridge
+
+volumes:
+  mysql_data:
