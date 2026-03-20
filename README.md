@@ -15,18 +15,15 @@ API REST PHP 8.2 sans framework pour la gestion de magasins (CRUD), avec authent
 
 ```bash
 # 1. Cloner / extraire le projet
-cd TEST-WSHOP
+cd TEST-WSHOP-API
 
-# 2. Copier le fichier d'environnement
-cp .env.example .env
-
-# 3. Démarrer les conteneurs
+# 2. Démarrer les conteneurs
 docker-compose up -d --build
 
-# 4. Installer les dépendances
+# 3. Installer les dépendances
 docker-compose exec php composer install
 
-# 5. Exécuter les migrations
+# 4. Exécuter les migrations
 docker-compose exec php php bin/migrate.php
 ```
 
@@ -204,20 +201,20 @@ Authorization: Bearer <token>
 
 ## Modèle Store
 
-| Champ        | Type    | Requis | Description                      |
-|--------------|---------|--------|----------------------------------|
-| id           | integer | —      | Identifiant auto-généré          |
-| name         | string  | Oui    | Nom du magasin (max 150)         |
-| address      | string  | Oui    | Adresse (max 255)                |
-| city         | string  | Oui    | Ville (max 100)                  |
-| postal_code  | string  | Oui    | Code postal (max 20)             |
-| country      | string  | Non    | Pays (défaut: FR, max 100)       |
-| phone        | string  | Non    | Téléphone (max 30)               |
-| email        | string  | Non    | Email (max 150, validé)          |
-| category     | string  | Non    | Catégorie (max 80)               |
-| is_active    | boolean | Non    | Actif (défaut: true)             |
-| created_at   | string  | —      | Date de création (ISO 8601)      |
-| updated_at   | string  | —      | Date de mise à jour (ISO 8601)   |
+| Champ        | Type    | Requis | Description                |
+|--------------|---------|--------|----------------------------|
+| id           | integer | —      | Identifiant auto-généré    |
+| name         | string  | Oui    | Nom du magasin (max 150)   |
+| address      | string  | Oui    | Adresse (max 255)          |
+| city         | string  | Oui    | Ville (max 100)            |
+| postal_code  | string  | Oui    | Code postal (max 20)       |
+| country      | string  | Non    | Pays (défaut: FR, max 100) |
+| phone        | string  | Non    | Téléphone (max 30)         |
+| email        | string  | Non    | Email (max 150, validé)    |
+| category     | string  | Non    | Catégorie (max 80)         |
+| is_active    | boolean | Non    | Actif (défaut: true)       |
+| created_at   | string  | —      | Date de création           |
+| updated_at   | string  | —      | Date de mise à jour        |
 
 ---
 
@@ -255,16 +252,16 @@ Authorization: Bearer <token>
 ```
 
 **Codes HTTP :**
-| Code | Signification            |
-|------|--------------------------|
-| 200  | OK                       |
-| 201  | Créé                     |
-| 204  | Supprimé (pas de corps)  |
-| 401  | Non authentifié          |
-| 404  | Ressource introuvable    |
-| 409  | Conflit (email dupliqué) |
-| 422  | Erreur de validation     |
-| 500  | Erreur serveur           |
+| Code | Signification                 |
+|------|-------------------------------|
+| 200  | OK                            |
+| 201  | Créé                          |
+| 204  | Supprimé (pas de corps)       |
+| 401  | Non authentifié               |
+| 404  | Ressource introuvable         |
+| 409  | Conflit (email déjà existant) |
+| 422  | Erreur de validation          |
+| 500  | Erreur serveur                |
 
 ---
 
@@ -276,9 +273,9 @@ docker-compose exec php composer qa
 
 # Ou chaque outil séparément
 docker-compose exec php composer phpstan # Analyse statique (niveau 6)
-docker-compose exec php composer cs-check  # Vérification du style (dry-run, aucune écriture)
-docker-compose exec php composer cs-fix # Correction automatique du style
-docker-compose exec php composer test # Tests unitaires et d'intégration
+docker-compose exec php composer cs-check  # Vérification de la syntaxe des fichiers PHP (dry-run, aucune écriture)
+docker-compose exec php composer cs-fix # Correction automatique de la syntaxe des fichiers PHP
+docker-compose exec php composer test # Tests unitaires
 ```
 
 ---
@@ -329,21 +326,3 @@ src/
 - SRP (une responsabilité par classe) 
 - Value Objects immutables (`readonly class`) 
 - Injection de dépendances par constructeur.
-
----
-
-## Commandes utiles
-
-```bash
-# Voir les logs PHP
-docker-compose logs -f php
-
-# Accéder au conteneur PHP
-docker-compose exec php sh
-
-# Arrêter les services
-docker-compose down
-
-# Supprimer aussi les volumes (reset BDD)
-docker-compose down -v
-```
