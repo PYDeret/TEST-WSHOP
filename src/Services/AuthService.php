@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Database\SqlLoader;
 use App\Exceptions\Auth\EmailAlreadyExistingException;
 use App\Exceptions\Auth\ExpiredTokenException;
 use App\Exceptions\Auth\InvalidCredentialsException;
@@ -49,7 +50,7 @@ class AuthService
         $email = mb_strtolower(trim((string)$body['email']));
         $password = (string)$body['password'];
 
-        $stmt = $this->pdo->prepare('SELECT id FROM users WHERE email = :email');
+        $stmt = $this->pdo->prepare(SqlLoader::load('users/find_id_by_email.sql'));
         $stmt->execute([
             ':email' => $email,
         ]);
@@ -58,7 +59,7 @@ class AuthService
             throw new EmailAlreadyExistingException();
         }
 
-        $stmt = $this->pdo->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
+        $stmt = $this->pdo->prepare(SqlLoader::load('users/create.sql'));
         $stmt->execute([
             ':email' => $email,
             ':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]),
@@ -89,7 +90,7 @@ class AuthService
         $email = mb_strtolower(trim((string)$body['email']));
         $password = (string)$body['password'];
 
-        $stmt = $this->pdo->prepare('SELECT id, password FROM users WHERE email = :email');
+        $stmt = $this->pdo->prepare(SqlLoader::load('users/find_by_email.sql'));
         $stmt->execute([
             ':email' => $email,
         ]);

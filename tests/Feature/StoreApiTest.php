@@ -25,22 +25,7 @@ class StoreApiTest extends TestCase
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
 
-        $this->pdo->exec('
-            CREATE TABLE stores (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                address TEXT NOT NULL,
-                city TEXT NOT NULL,
-                postal_code TEXT NOT NULL,
-                country TEXT NOT NULL DEFAULT "FR",
-                phone TEXT,
-                email TEXT,
-                category TEXT,
-                is_active INTEGER NOT NULL DEFAULT 1,
-                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-            )
-        ');
+        $this->pdo->exec((string) file_get_contents(__DIR__ . '/../fixtures/stores_schema.sql'));
 
         Database::setInstance($this->pdo);
 

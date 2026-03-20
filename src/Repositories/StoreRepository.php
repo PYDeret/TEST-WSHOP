@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Database\SqlLoader;
 use App\Models\Store;
 use App\Repositories\Contracts\StoreRepositoryInterface;
 use InvalidArgumentException;
@@ -34,7 +35,11 @@ class StoreRepository implements StoreRepositoryInterface
         $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
         $offset = ($page - 1) * $perPage;
 
-        $sql = "SELECT * FROM stores $where ORDER BY $sort $order LIMIT :limit OFFSET :offset";
+        $sql = str_replace(
+            ['{where}', '{sort}', '{order}'],
+            [$where, $sort, $order],
+            SqlLoader::load('stores/find_all.sql'),
+        );
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -59,7 +64,7 @@ class StoreRepository implements StoreRepositoryInterface
     {
         [$where, $bindings] = $this->buildWhereClause($filters);
 
-        $sql = "SELECT COUNT(*) FROM stores $where";
+        $sql = str_replace('{where}', $where, SqlLoader::load('stores/count_all.sql'));
         $stmt = $this->pdo->prepare($sql);
 
         foreach ($bindings as $key => $value) {
@@ -73,7 +78,7 @@ class StoreRepository implements StoreRepositoryInterface
 
     public function findById(int $id): ?Store
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM stores WHERE id = :id');
+        $stmt = $this->pdo->prepare(SqlLoader::load('stores/find_by_id.sql'));
         $stmt->execute([':id' => $id]);
 
         $row = $stmt->fetch();
@@ -83,12 +88,7 @@ class StoreRepository implements StoreRepositoryInterface
 
     public function create(Store $store): Store
     {
-        $sql = '
-            INSERT INTO stores (name, address, city, postal_code, country, phone, email, category, is_active)
-            VALUES (:name, :address, :city, :postal_code, :country, :phone, :email, :category, :is_active)
-        ';
-
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(SqlLoader::load('stores/create.sql'));
         $stmt->execute($this->bindStoreParams($store));
 
         $created = $this->findById((int)$this->pdo->lastInsertId());
@@ -106,15 +106,7 @@ class StoreRepository implements StoreRepositoryInterface
             throw new InvalidArgumentException('Cannot update a store without an id');
         }
 
-        $sql = '
-            UPDATE stores
-            SET name = :name, address = :address, city = :city, postal_code = :postal_code,
-                country = :country, phone = :phone, email = :email, category = :category,
-                is_active = :is_active
-            WHERE id = :id
-        ';
-
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->pdo->prepare(SqlLoader::load('stores/update.sql'));
         $stmt->execute([...$this->bindStoreParams($store), ':id' => $store->id]);
 
         $updated = $this->findById($store->id);
@@ -128,7 +120,7 @@ class StoreRepository implements StoreRepositoryInterface
 
     public function delete(int $id): void
     {
-        $stmt = $this->pdo->prepare('DELETE FROM stores WHERE id = :id');
+        $stmt = $this->pdo->prepare(SqlLoader::load('stores/delete.sql'));
         $stmt->execute([':id' => $id]);
     }
 
