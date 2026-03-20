@@ -37,7 +37,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"monmotdepasse\"\n}",
+              "raw": "{\n  \"email\": \"pyderet@gmail.com\",\n  \"password\": \"m0nM0t2p4$$\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -79,7 +79,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"monmotdepasse\"\n}",
+              "raw": "{\n  \"email\": \"pyderet@gmail.com\",\n  \"password\": \"m0nM0t2p4$$\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -177,7 +177,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Ma Boutique\",\n  \"address\": \"10 rue de la Paix\",\n  \"city\": \"Paris\",\n  \"postal_code\": \"75001\",\n  \"country\": \"FR\",\n  \"phone\": \"0123456789\",\n  \"email\": \"contact@maboutique.fr\",\n  \"category\": \"clothing\",\n  \"is_active\": true\n}",
+              "raw": "{\n  \"name\": \"WSHOP\",\n  \"address\": \"11BIS 13, RUE DU COLISÉE\",\n  \"city\": \"Paris\",\n  \"postal_code\": \"75008\",\n  \"country\": \"FR\",\n  \"phone\": \"0142460228\",\n  \"email\": \"contact@wshop.com\",\n  \"category\": \"clothing\",\n  \"is_active\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"

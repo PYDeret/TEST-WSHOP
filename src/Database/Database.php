@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Database;
 
+use App\Exceptions\Database\DatabaseConnectionFailedException;
 use PDO;
 use PDOException;
-use RuntimeException;
 
 class Database
 {
@@ -43,7 +43,7 @@ class Database
                 ],
             );
         } catch (PDOException $e) {
-            throw new RuntimeException('Database connection failed: ' . $e->getMessage());
+            throw new DatabaseConnectionFailedException('Database connection failed : ' . $e->getMessage());
         }
 
         return $pdo;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Router;
 
-use App\Exceptions\HttpException;
+use App\Exceptions\Route\RouteNotFoundException;
 
 class Router
 {
@@ -62,6 +62,6 @@ class Router
             return;
         }
 
-        throw new HttpException('Route not found', 404);
+        throw new RouteNotFoundException();
     }
 }

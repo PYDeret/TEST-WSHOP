@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Cache\CacheInterface;
-use App\Exceptions\NotFoundException;
+use App\Exceptions\Store\StoreNotFoundException;
 use App\Exceptions\ValidationException;
 use App\Models\Store;
 use App\Repositories\Contracts\StoreRepositoryInterface;
@@ -79,7 +79,7 @@ class StoreService
         $store = $this->repository->findById($id);
 
         if ($store === null) {
-            throw new NotFoundException("Store #$id not found");
+            throw new StoreNotFoundException($id);
         }
 
         $result = ['data' => $this->serializer->toArray($store)];
@@ -119,7 +119,7 @@ class StoreService
         $existing = $this->repository->findById($id);
 
         if ($existing === null) {
-            throw new NotFoundException("Store #$id not found");
+            throw new StoreNotFoundException($id);
         }
 
         $errors = $this->validator->validateUpdate($body);
@@ -148,7 +148,7 @@ class StoreService
         $existing = $this->repository->findById($id);
 
         if ($existing === null) {
-            throw new NotFoundException("Store #$id not found");
+            throw new StoreNotFoundException($id);
         }
 
         $errors = $this->validator->validatePatch($body);
@@ -171,7 +171,7 @@ class StoreService
     public function delete(int $id): void
     {
         if ($this->repository->findById($id) === null) {
-            throw new NotFoundException("Store #$id not found");
+            throw new StoreNotFoundException($id);
         }
 
         $this->repository->delete($id);

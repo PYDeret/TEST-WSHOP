@@ -34,7 +34,7 @@ class StoreRepository implements StoreRepositoryInterface
         $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
         $offset = ($page - 1) * $perPage;
 
-        $sql = "SELECT * FROM stores{$where} ORDER BY {$sort} {$order} LIMIT :limit OFFSET :offset";
+        $sql = "SELECT * FROM stores $where ORDER BY $sort $order LIMIT :limit OFFSET :offset";
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -47,7 +47,7 @@ class StoreRepository implements StoreRepositoryInterface
         $stmt->execute();
 
         return array_values(array_map(
-            fn (array $row) => Store::fromArray($row),
+            static fn (array $row) => Store::fromArray($row),
             $stmt->fetchAll(),
         ));
     }
@@ -59,7 +59,7 @@ class StoreRepository implements StoreRepositoryInterface
     {
         [$where, $bindings] = $this->buildWhereClause($filters);
 
-        $sql = "SELECT COUNT(*) FROM stores{$where}";
+        $sql = "SELECT COUNT(*) FROM stores $where";
         $stmt = $this->pdo->prepare($sql);
 
         foreach ($bindings as $key => $value) {
@@ -149,8 +149,8 @@ class StoreRepository implements StoreRepositoryInterface
             }
 
             if (in_array($field, self::ALLOWED_FILTERS, true)) {
-                $conditions[] = "{$field} = :{$field}";
-                $bindings[":{$field}"] = $value;
+                $conditions[] = "$field = :$field";
+                $bindings[":$field"] = $value;
             }
         }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Cache\NullCache;
-use App\Exceptions\NotFoundException;
+use App\Exceptions\Store\StoreNotFoundException;
 use App\Exceptions\ValidationException;
 use App\Models\Store;
 use App\Repositories\Contracts\StoreRepositoryInterface;
@@ -87,7 +87,7 @@ class StoreServiceTest extends TestCase
     {
         $this->repository->method('findById')->willReturn(null);
 
-        $this->expectException(NotFoundException::class);
+        $this->expectException(StoreNotFoundException::class);
 
         $this->service->show(999);
     }
@@ -122,7 +122,7 @@ class StoreServiceTest extends TestCase
     {
         $this->repository->method('findById')->willReturn(null);
 
-        $this->expectException(NotFoundException::class);
+        $this->expectException(StoreNotFoundException::class);
 
         $this->service->delete(999);
     }
@@ -142,7 +142,7 @@ class StoreServiceTest extends TestCase
     {
         $this->repository->method('findById')->willReturn(null);
 
-        $this->expectException(NotFoundException::class);
+        $this->expectException(StoreNotFoundException::class);
 
         $this->service->patch(999, ['city' => 'Marseille']);
     }

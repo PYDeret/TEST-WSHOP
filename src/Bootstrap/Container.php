@@ -16,6 +16,7 @@ use App\Repositories\StoreRepository;
 use App\Serializers\StoreSerializer;
 use App\Services\AuthService;
 use App\Services\StoreService;
+use App\Validators\AuthValidator;
 use App\Validators\StoreValidator;
 use PDO;
 
@@ -72,7 +73,10 @@ class Container
 
     public function authService(): AuthService
     {
-        return $this->authService ??= new AuthService($this->pdo());
+        return $this->authService ??= new AuthService(
+            $this->pdo(),
+            new AuthValidator(),
+        );
     }
 
     public function storeController(): StoreController

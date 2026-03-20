@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Cache;
 
+use App\Exceptions\Redis\RedisConnectionFailedException;
 use Redis;
-use RuntimeException;
 
 readonly class RedisCache implements CacheInterface
 {
@@ -20,7 +20,7 @@ readonly class RedisCache implements CacheInterface
         $this->redis = new Redis();
 
         if (!$this->redis->connect($host, $port, 2.0)) {
-            throw new RuntimeException('Redis connection failed');
+            throw new RedisConnectionFailedException();
         }
 
         if ($password) {

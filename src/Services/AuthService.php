@@ -4,25 +4,33 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exceptions\HttpException;
-use App\Exceptions\UnauthorizedException;
+use App\Exceptions\Auth\EmailAlreadyExistingException;
+use App\Exceptions\Auth\ExpiredTokenException;
+use App\Exceptions\Auth\InvalidCredentialsException;
+use App\Exceptions\Auth\JwtNotConfiguredException;
 use App\Exceptions\ValidationException;
+use App\Validators\AuthValidator;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PDO;
 
 class AuthService
 {
+    private const ALGORITMH = 'HS256';
+    private const TOKEN_TYPE = 'Bearer';
+
     private string $jwtSecret;
     private int $jwtTtl;
 
-    public function __construct(private readonly PDO $pdo)
-    {
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly AuthValidator $authValidator,
+    ) {
         $this->jwtSecret = $_ENV['JWT_SECRET'] ?? '';
         $this->jwtTtl = (int)($_ENV['JWT_TTL'] ?? 86400);
 
         if (empty($this->jwtSecret)) {
-            throw new \RuntimeException('JWT_SECRET must be configured');
+            throw new JwtNotConfiguredException();
         }
     }
 
@@ -32,7 +40,7 @@ class AuthService
      */
     public function register(array $body): array
     {
-        $errors = $this->validateCredentials($body);
+        $errors = $this->authValidator->validateCreate($body);
 
         if ($errors) {
             throw new ValidationException($errors);
@@ -47,7 +55,7 @@ class AuthService
         ]);
 
         if ($stmt->fetch()) {
-            throw new HttpException('Email already registered', 409);
+            throw new EmailAlreadyExistingException();
         }
 
         $stmt = $this->pdo->prepare('INSERT INTO users (email, password) VALUES (:email, :password)');
@@ -61,7 +69,7 @@ class AuthService
 
         return [
             'token' => $token,
-            'token_type' => 'Bearer',
+            'token_type' => self::TOKEN_TYPE,
             'expires_in' => $this->jwtTtl,
         ];
     }
@@ -72,7 +80,7 @@ class AuthService
      */
     public function login(array $body): array
     {
-        $errors = $this->validateCredentials($body);
+        $errors = $this->authValidator->validateCreate($body);
 
         if ($errors) {
             throw new ValidationException($errors);
@@ -89,14 +97,14 @@ class AuthService
         $user = $stmt->fetch();
 
         if (!$user || !password_verify($password, $user['password'])) {
-            throw new UnauthorizedException('Invalid credentials');
+            throw new InvalidCredentialsException();
         }
 
         $token = $this->generateToken((int)$user['id'], $email);
 
         return [
             'token' => $token,
-            'token_type' => 'Bearer',
+            'token_type' => self::TOKEN_TYPE,
             'expires_in' => $this->jwtTtl,
         ];
     }
@@ -104,9 +112,9 @@ class AuthService
     public function verifyToken(string $token): object
     {
         try {
-            return JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
+            return JWT::decode($token, new Key($this->jwtSecret, self::ALGORITMH));
         } catch (\Throwable) {
-            throw new UnauthorizedException('Invalid or expired token');
+            throw new ExpiredTokenException();
         }
     }
 
@@ -120,29 +128,6 @@ class AuthService
             'exp' => time() + $this->jwtTtl,
         ];
 
-        return JWT::encode($payload, $this->jwtSecret, 'HS256');
-    }
-
-    /**
-     * @param array<string, mixed> $body
-     * @return array<string, string>
-     */
-    private function validateCredentials(array $body): array
-    {
-        $errors = [];
-
-        if (empty($body['email'])) {
-            $errors['email'] = 'The email field is required.';
-        } elseif (!filter_var($body['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = 'The email field must be a valid email address.';
-        }
-
-        if (empty($body['password'])) {
-            $errors['password'] = 'The password field is required.';
-        } elseif (strlen((string)$body['password']) < 8) {
-            $errors['password'] = 'The password must be at least 8 characters.';
-        }
-
-        return $errors;
+        return JWT::encode($payload, $this->jwtSecret, self::ALGORITMH);
     }
 }

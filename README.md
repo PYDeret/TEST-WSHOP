@@ -15,7 +15,7 @@ API REST PHP 8.2 sans framework pour la gestion de magasins (CRUD), avec authent
 
 ```bash
 # 1. Cloner / extraire le projet
-cd wshop-api-rest-test
+cd TEST-WSHOP
 
 # 2. Copier le fichier d'environnement
 cp .env.example .env
@@ -43,7 +43,7 @@ L'API est disponible sur **http://localhost:8080**.
 ### 1. Importer la collection et l'environnement
 
 1. Ouvrir Postman
-2. **File → Import** (ou glisser-déposer) les deux fichiers :
+2. **File → Import** les deux fichiers :
    - `postman/wshop-api.postman_collection.json`
    - `postman/wshop-api.postman_environment.json`
 3. En haut à droite, sélectionner l'environnement **wshop-api — local**
@@ -83,8 +83,8 @@ POST /api/auth/register
 Content-Type: application/json
 
 {
-  "email": "admin@example.com",
-  "password": "monmotdepasse"
+  "email": "pyderet@gmail.com",
+  "password": "m0nM0t2p4$$"
 }
 ```
 
@@ -96,8 +96,8 @@ POST /api/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@example.com",
-  "password": "monmotdepasse"
+  "email": "pyderet@gmail.com",
+  "password": "m0nM0t2p4$$"
 }
 ```
 
@@ -154,13 +154,13 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "name": "Ma Boutique",
-  "address": "10 rue de la Paix",
+  "name": "WSHOP",
+  "address": "11BIS 13, RUE DU COLISÉE",
   "city": "Paris",
-  "postal_code": "75001",
+  "postal_code": "75008",
   "country": "FR",
-  "phone": "0123456789",
-  "email": "contact@maboutique.fr",
+  "phone": "0142460228",
+  "email": "contact@wshop.com",
   "category": "clothing",
   "is_active": true
 }
